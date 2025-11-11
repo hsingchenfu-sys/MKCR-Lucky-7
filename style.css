@@ -1,0 +1,72 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.slot-machine {
+    background-color: #fff;
+    border: 10px solid gold;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+h1 {
+    color: #cc0000;
+    margin-bottom: 20px;
+}
+
+.reels-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.reel {
+    width: 100px;
+    height: 100px;
+    margin: 0 10px;
+    background-color: #333;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 60px;
+    border: 5px solid #ffaa00;
+    border-radius: 10px;
+    overflow: hidden; /* 確保符號在邊界內 */
+}
+
+.message {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    min-height: 20px; /* 確保空間穩定 */
+}
+
+#spinButton {
+    padding: 15px 30px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: white;
+    background-color: #4CAF50; /* 綠色按鈕 */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#spinButton:hover {
+    background-color: #45a049;
+}
+
+#spinButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
