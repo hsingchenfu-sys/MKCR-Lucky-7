@@ -1,72 +1,262 @@
-body {
+/* --- 全局設定與真正的滿版佈局 --- */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;  /* 保持滿版 */
+    width: 100%;  /* 保持滿版 */
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    background-color: #f0f0f0;
+    background-color: #f0f0f0;  
+    color: #333;
+    overflow: hidden;  
 }
 
+/* 核心機台容器：顏色已淡化，並修正【整體內容垂直置中】 */
 .slot-machine {
-    background-color: #fff;
-    border: 10px solid gold;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    width: 100%;  
+    height: 100%;  
+    max-width: 600px;  
+    max-height: 900px;  
+    padding: 8vh 8vw;  
+    background: linear-gradient(45deg, silver 0%, lightgray 100%);  
+    
+    border: none;  
+    border-radius: 0;  
+    box-shadow: none;  
     text-align: center;
-}
-
-h1 {
-    color: #cc0000;
-    margin-bottom: 20px;
-}
-
-.reels-container {
+    position: relative;
+    
     display: flex;
-    justify-content: center;
-    margin-bottom: 30px;
+    flex-direction: column;
+    
+    /* 將所有內容 (訊息/轉盤/按鈕) 垂直置中 */
+    justify-content: center; 
+    gap: 4vh; /* 增加元素之間的垂直間距 */
+    
+    align-items: center;  
+    box-sizing: border-box;  
 }
 
-.reel {
-    width: 100px;
-    height: 100px;
-    margin: 0 10px;
-    background-color: #333;
-    color: white;
+/* 容器中獎特效 (保留) */
+@keyframes win-implode {
+    0%    { box-shadow: inset 0 0 0px gold; }
+    50%  { box-shadow: inset 0 0 40px gold; }
+    100% { box-shadow: inset 0 0 0px gold; }
+}
+
+.slot-machine.win1, .slot-machine.win2 {
+    animation: win-implode 0.3s infinite alternate;
+}
+
+
+/* 頂部顯示區域 (隱藏標題，不變) */
+.header-display {
+    display: none;  
+}
+
+/* ------------------------------------- */
+/* --- 輪子相關樣式 (淡色，修正【轉盤內置中】和【橫線置中】) --- */
+/* ------------------------------------- */
+
+.slots {
+    width: 300px;  
+    height: 280px;  
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    
+    /* 確保三個轉盤在容器內垂直置中 */
     align-items: center;
-    font-size: 60px;
-    border: 5px solid #ffaa00;
-    border-radius: 10px;
-    overflow: hidden; /* 確保符號在邊界內 */
+    
+    padding: 20px;  
+    
+    background: linear-gradient(45deg, silver 0%, lightgray 100%);
+    
+    /* 邊框：柔和的 1px 邊框 */
+    border-top: 1px solid rgba(255, 255, 255, 0.7);    
+    border-right: 1px solid rgba(255, 255, 255, 0.6);
+    border-left: 1px solid rgba(0, 0, 0, 0.1);      
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    
+    /* 外部陰影：柔和陰影 */
+    box-shadow: -2px 3px 3px 1px rgba(0, 0, 0, 0.3);  
+    
+    position: relative;  
+    z-index: 10;  
+
+    border-radius: 8px;
+    flex-shrink: 0;
 }
 
-.message {
-    font-size: 1.2em;
+/* 實現兩側的橫線 (置中修正) */
+.slots::before,  
+.slots::after {
+    content:"";
+    position: absolute;
+    top: 50%; 
+    width: 10px;      
+    height: 2px;      
+    background-color: rgba(0, 0, 0, 0.5);  
+}
+
+.slots::before {
+    left: 0;
+    /* 【橫線修正】向上微調 1px */
+    transform: translate(calc(-100% - 10px), calc(-50% - 1px));  
+}
+
+.slots::after {
+    right: 0;
+    /* 【橫線修正】向上微調 1px */
+    transform: translate(calc(100% + 10px), calc(-50% - 1px));  
+}
+
+
+.slots .reel {
+    width: 80px;  
+    height: 240px;  
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    overflow: hidden;
+    background-image: url(https://assets.codepen.io/439000/slotreel.webp);  
+    background-position: 0 0;
+    background-repeat: repeat-y;
+    background-size: 100%;  
+    position: relative;  
+    transition: background-position-y 0s;  
+}
+
+.slots .reel::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4) 0%, transparent 30%, transparent 70%, rgba(0, 0, 0, 0.4) 100%);
+    box-shadow: inset 0 0 6px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ------------------------------------- */
+/* --- 捲軸發光特效 (禁用動畫，保持穩定) --- */
+/* ------------------------------------- */
+
+@keyframes flash {
+    0%, 100% {  box-shadow: none; opacity: 1; }
+    50% { box-shadow: none; opacity: 1; }
+}
+
+.slots .reel.highlight-reel {
+    animation: none; 
+}
+
+
+/* ------------------------------------- */
+/* --- 訊息和 START 按鈕樣式 (修正訊息長度位移及字體大小) --- */
+/* ------------------------------------- */
+
+#message {
+    /* 【排版修正】: 設定固定高度並使用 Flexbox 置中，防止下方位移 */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    text-align: center;
+    
+    /* 【字體修正】: 鎖定主字體大小並嘗試繼承 */
+    font-size: 32px !important; 
     font-weight: bold;
     color: #333;
-    min-height: 20px; /* 確保空間穩定 */
+    
+    /* 預設一個足夠的高度來容納最長的兩行訊息 */
+    height: 10vh; 
+    max-height: 80px; 
+}
+
+/* 確保 #message 內的所有元素都繼承正確的字體大小 */
+#message * {
+    font-size: inherit !important; 
+    line-height: 1.2; 
+}
+
+#message .detail-text {
+    /* detail-text 保持為 66.67% 的比例 */
+    font-size: 66.67% !important;    
 }
 
 #spinButton {
-    padding: 15px 30px;
-    font-size: 1.5em;
+    /* **放大按鈕尺寸** */
+    width: min(25vh, 25vw, 150px); 
+    height: min(25vh, 25vw, 150px); 
+    padding: 0;    
+    line-height: min(25vh, 25vw, 150px); 
+    
+    font-size: min(5vw, 5vh, 40px); 
     font-weight: bold;
     color: white;
-    background-color: #4CAF50; /* 綠色按鈕 */
-    border: none;
-    border-radius: 8px;
+    background-color: #cc0000;    
+    border: 5px solid #ff5555;
+    border-radius: 50%;    
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.1s, box-shadow 0.1s, transform 0.1s;    
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);    
 }
 
 #spinButton:hover {
-    background-color: #45a049;
+    background-color: #aa0000;    
+}
+
+#spinButton:active {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    transform: translateY(4px);
 }
 
 #spinButton:disabled {
-    background-color: #cccccc;
+    background-color: #cc0000;    
+    border-color: #ff5555;    
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);    
     cursor: not-allowed;
+    transform: none;    
+    opacity: 0.9;    
+}
+
+
+/* ------------------------------------- */
+/* --- 新增：歸零按鈕樣式 --- */
+/* ------------------------------------- */
+
+#resetButton {
+    /* 尺寸設定：比 START 按鈕小，方形 */
+    width: 120px;
+    height: 40px;
+    
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    
+    /* 棕色背景與邊框 */
+    background-color: #8b4513; /* Saddle Brown */
+    border: 3px solid #a0522d; /* Sienna */
+    border-radius: 6px; /* 輕微圓角 */
+    
+    cursor: pointer;
+    transition: background-color 0.1s, box-shadow 0.1s, transform 0.1s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+#resetButton:hover {
+    background-color: #69340f; /* 懸停時變深 */
+}
+
+#resetButton:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transform: translateY(2px);
+}
+
+#resetButton:disabled {
+    background-color: #8b4513; 
+    border-color: #a0522d;
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
 }

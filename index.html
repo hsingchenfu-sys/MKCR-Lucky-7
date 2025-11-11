@@ -3,23 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>吃角子老虎機</title>
-    <link rel="stylesheet" href="style.css"> </head>
+    <title>老虎機遊戲</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
 <body>
-
     <div class="slot-machine">
-        <h1>🎰 吃角子老虎機 🎰</h1>
+        <h1 class="header-display">幸運老虎機</h1>
         
-        <div class="reels-container">
-            <div class="reel" id="reel1">🍒</div>
-            <div class="reel" id="reel2">🔔</div>
-            <div class="reel" id="reel3">🍋</div>
+        <div id="message">按下「START」開始遊戲！</div>
+        
+        <div class="slots">
+            <div class="reel"></div>
+            <div class="reel"></div>
+            <div class="reel"></div>
         </div>
-
-        <p class="message" id="message">按下「旋轉」開始遊戲！</p>
-
-        <button id="spinButton">旋轉</button>
+        
+        <button id="spinButton">START</button>
+        
+        <button id="resetButton">轉盤歸零</button> 
+        
     </div>
 
-    <script src="script.js"></script> </body>
+    <script src="script.js"></script> 
+</body>
 </html>
