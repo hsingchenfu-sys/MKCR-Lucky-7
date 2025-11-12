@@ -220,7 +220,7 @@ function rollAll() {
 document.addEventListener('DOMContentLoaded', () => {
     
     // 【修正點】：設定網頁 TAB 標籤名稱 (Title)
-    document.title = "NKCR Lucky 7"; 
+    document.title = "MKCR Lucky 7"; 
     
     // 主按鈕處理邏輯：根據模式執行 SPIN 或 RESET
     if (spinButton) {
