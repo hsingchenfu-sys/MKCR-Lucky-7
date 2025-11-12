@@ -45,7 +45,7 @@ function setButtonToResetMode() {
     isResetMode = true;
     if (spinButton) {
         spinButton.disabled = false;
-        // 【修正點】：變更標籤為「RESET」
+        // 變更標籤為「RESET」
         spinButton.textContent = 'RESET'; 
         spinButton.classList.add('reset-mode'); 
     }
@@ -60,7 +60,7 @@ function setButtonToSpinMode() {
     }
     // 初始/歸零訊息
     if (messageElement) {
-        messageElement.innerHTML = '按下「START」開始挑戰！';
+        messageElement.innerHTML = '按下「START」<br>開始挑戰！';
     }
     // 歸零轉盤位置
     reelsList.forEach(reel => {
@@ -140,14 +140,15 @@ const roll = (reel, offset = 0) => {
  */
 function rollAll() {
      
-    if (spinButton) spinButton.disabled = true;
+    // 注意：按鈕在 click event handler 已經被 disabled
+    // if (spinButton) spinButton.disabled = true; 
      
     // 1. 清除舊的樣式
     slotMachineContainer.classList.remove('win1', 'win2', 'win3');
     reelsList.forEach(reel => reel.classList.remove('highlight-reel')); 
 
     // 旋轉中訊息
-    if (messageElement) messageElement.innerHTML = '轉盤中...祝你好運！';
+    if (messageElement) messageElement.innerHTML = '轉盤中...祝您好運！';
 
 	
 	Promise
@@ -175,10 +176,10 @@ function rollAll() {
                     const resultLine = `三連 ${tripleIconName}-${tripleIconName}-${tripleIconName}`; 
 
                     if (isSevenTriple) {
-                        messageHTML = `恭喜！👑 頭獎<br>(${resultLine})`;
+                        messageHTML = `恭喜！👑 頭獎`;
                         winCls = "win3"; 
                     } else {
-                        messageHTML = `恭喜！🎉 大獎<br>(${resultLine})`;
+                        messageHTML = `恭喜！🎉 大獎`;
                         winCls = "win2"; 
                     }
                 } else if (isDouble) {
@@ -219,7 +220,7 @@ function rollAll() {
 // 【連接事件和初始化】
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 【修正點】：設定網頁 TAB 標籤名稱 (Title)
+    // 設定網頁 TAB 標籤名稱 (Title)
     document.title = "MKCR Lucky 7"; 
     
     // 主按鈕處理邏輯：根據模式執行 SPIN 或 RESET
@@ -228,7 +229,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isResetMode) {
                 setButtonToSpinMode(); // 執行歸零，並切換回 START 模式
             } else {
-                rollAll(); // 執行 SPIN
+                // 【核心修正點】：先禁用按鈕並延遲，等待按鈕彈回
+                spinButton.disabled = true; 
+                
+                // 設定延遲時間，約 100ms 讓 CSS 彈起動畫完成
+                const buttonReleaseDelay = 100; 
+                
+                setTimeout(() => {
+                    rollAll(); // 延遲後才開始轉動輪盤
+                }, buttonReleaseDelay);
             }
         });
     }

@@ -1,3 +1,13 @@
+/* 【重要修正】：移除行動裝置和 WebKit 瀏覽器點擊時的藍色高亮效果 */
+* {
+    -webkit-tap-highlight-color: transparent;
+}/* 【重要修正】：移除行動裝置和 WebKit 瀏覽器點擊時的藍色高亮效果 */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+
 /* --- 全局設定與真正的滿版佈局 --- */
 body, html {
     margin: 0;
@@ -21,7 +31,7 @@ body, html {
     max-width: 600px;  
     max-height: 900px;  
     padding: 8vh 8vw;  
-    background: linear-gradient(45deg, silver 0%, lightgray 100%);  
+    background: linear-gradient(45deg,gainsboro 0%, whitesmoke 100%);  
     
     border: none;  
     border-radius: 0;  
@@ -43,7 +53,7 @@ body, html {
 /* 容器中獎特效 (保留) */
 @keyframes win-implode {
     0%    { box-shadow: inset 0 0 0px gold; }
-    50%  { box-shadow: inset 0 0 40px gold; }
+    50%  { box-shadow: inset 0 0 100px gold; }
     100% { box-shadow: inset 0 0 0px gold; }
 }
 
@@ -72,21 +82,21 @@ body, html {
     
     padding: 20px;  
     
-    background: linear-gradient(45deg, silver 0%, lightgray 100%);
+    background: linear-gradient(45deg, gainsboro 0%, whitesmoke 100%);
     
     /* 邊框：柔和的 1px 邊框 */
-    border-top: 1px solid rgba(255, 255, 255, 0.7);    
-    border-right: 1px solid rgba(255, 255, 255, 0.6);
-    border-left: 1px solid rgba(0, 0, 0, 0.1);      
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: 8px solid rgba(255, 255, 255, 0.8);    
+    border-right: 8px solid rgba(255, 255, 255, 0.7);
+    border-left: 8px solid rgba(0, 0, 0, 0.1);      
+    border-bottom: 8px solid rgba(0, 0, 0, 0.1);
     
     /* 外部陰影：柔和陰影 */
-    box-shadow: -2px 3px 3px 1px rgba(0, 0, 0, 0.3);  
+    box-shadow: -4px 4px 4px 1px rgba(0, 0, 0, 0.2);  
     
     position: relative;  
     z-index: 10;  
 
-    border-radius: 8px;
+    border-radius: 16px;
     flex-shrink: 0;
 }
 
@@ -96,9 +106,9 @@ body, html {
     content:"";
     position: absolute;
     top: 50%;  
-    width: 10px;      
-    height: 2px;      
-    background-color: rgba(0, 0, 0, 0.5);  
+    width: 20px;      
+    height: 8px;      
+    background-color: rgba(0, 0, 0, 0.6);  
 }
 
 .slots::before {
@@ -219,6 +229,22 @@ body, html {
     will-change: transform, box-shadow; 
     position: relative;
     z-index: 10;
+    
+    /* 【修正點 1/2】：移除點擊時的藍色輪廓/選取框 */
+    outline: none !important; 
+    
+    /* 【修正點 2/2】：防止文字或元素內容被選取時的高亮 */
+    user-select: none;
+}
+
+/* 【修正點 3/3】：確保在獲得焦點時也沒有藍色輪廓 */
+#spinButton:focus {
+    outline: none !important;
+    /* 複製正常狀態的陰影，確保視覺不變 */
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.4), 
+        inset 0 2px 4px rgba(255, 255, 255, 0.3), 
+        inset 0 -2px 4px rgba(0, 0, 0, 0.4); 
 }
 
 #spinButton:hover {
@@ -262,6 +288,18 @@ body, html {
     will-change: transform, box-shadow;
     position: relative;
     z-index: 10;
+    
+    /* 【修正點 4/5】：繼承基礎 outline: none; */
+}
+
+/* 【修正點 5/5】：確保 RESET 模式獲得焦點時也沒有藍色輪廓 */
+#spinButton.reset-mode:focus {
+    outline: none !important;
+    /* 複製 RESET 正常狀態的陰影，確保視覺不變 */
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.2), 
+        inset 0 2px 4px rgba(255, 255, 255, 0.7), 
+        inset 0 -1px 2px rgba(0, 0, 0, 0.2); 
 }
 
 #spinButton.reset-mode:hover {
