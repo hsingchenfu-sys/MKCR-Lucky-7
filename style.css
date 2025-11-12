@@ -11,6 +11,7 @@ body, html {
     background-color: #f0f0f0;  
     color: #333;
     overflow: hidden;  
+    box-sizing: border-box; /* 確保邊界計算正確 */
 }
 
 /* 核心機台容器：顏色已淡化，並修正【整體內容垂直置中】 */
@@ -32,7 +33,7 @@ body, html {
     flex-direction: column;
     
     /* 將所有內容 (訊息/轉盤/按鈕) 垂直置中 */
-    justify-content: center; 
+    justify-content: center;  
     gap: 4vh; /* 增加元素之間的垂直間距 */
     
     align-items: center;  
@@ -94,7 +95,7 @@ body, html {
 .slots::after {
     content:"";
     position: absolute;
-    top: 50%; 
+    top: 50%;  
     width: 10px;      
     height: 2px;      
     background-color: rgba(0, 0, 0, 0.5);  
@@ -148,115 +149,133 @@ body, html {
 }
 
 .slots .reel.highlight-reel {
-    animation: none; 
+    animation: none;  
 }
 
 
 /* ------------------------------------- */
-/* --- 訊息和 START 按鈕樣式 (修正訊息長度位移及字體大小) --- */
+/* --- 訊息和 START/歸零按鈕樣式 --- */
 /* ------------------------------------- */
 
 #message {
     /* 【排版修正】: 設定固定高度並使用 Flexbox 置中，防止下方位移 */
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
+    display: flex;  
+    justify-content: center;  
+    align-items: center;  
     text-align: center;
     
     /* 【字體修正】: 鎖定主字體大小並嘗試繼承 */
-    font-size: 32px !important; 
+    font-size: 32px !important;  
     font-weight: bold;
     color: #333;
     
     /* 預設一個足夠的高度來容納最長的兩行訊息 */
-    height: 10vh; 
-    max-height: 80px; 
+    height: 10vh;  
+    max-height: 80px;  
 }
 
 /* 確保 #message 內的所有元素都繼承正確的字體大小 */
 #message * {
-    font-size: inherit !important; 
-    line-height: 1.2; 
+    font-size: inherit !important;  
+    line-height: 1.2;  
 }
 
-#message .detail-text {
-    /* detail-text 保持為 66.67% 的比例 */
-    font-size: 66.67% !important;    
-}
-
+/* --- START 按鈕樣式 (紅色 - 強化) --- */
 #spinButton {
     /* **放大按鈕尺寸** */
-    width: min(25vh, 25vw, 150px); 
-    height: min(25vh, 25vw, 150px); 
+    width: min(25vh, 25vw, 150px);  
+    height: min(25vh, 25vw, 150px);  
     padding: 0;    
-    line-height: min(25vh, 25vw, 150px); 
     
-    font-size: min(5vw, 5vh, 40px); 
+    /* 確保文字置中 */
+    display: flex;
+    justify-content: center;  
+    align-items: center;      
+    line-height: 1;  
+    
+    font-size: min(5vw, 5vh, 40px);  
     font-weight: bold;
     color: white;
-    background-color: #cc0000;    
-    border: 5px solid #ff5555;
+    
+    /* 深紅色漸層 (標準顏色) */
+    background: linear-gradient(to top, #660000 0%, #cc0000 70%, #ff3333 100%);
+    
+    /* 邊框顏色改成深灰色 */
+    border: 5px solid #444444;  
+    
     border-radius: 50%;    
     cursor: pointer;
-    transition: background-color 0.1s, box-shadow 0.1s, transform 0.1s;    
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);    
+    
+    /* 調整過渡時間，讓 active 狀態回彈更快 */
+    transition: background 0.1s, box-shadow 0.1s, transform 0.05s ease-out;    
+    
+    /* 外部陰影縮小，內部陰影柔和化 */
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.4), /* 外部陰影減小 */
+        inset 0 2px 4px rgba(255, 255, 255, 0.3), /* 內部亮面柔和 */
+        inset 0 -2px 4px rgba(0, 0, 0, 0.4); /* 內部暗面柔和 */
+
+    transform: translateZ(0); 
+    will-change: transform, box-shadow; 
+    position: relative;
+    z-index: 10;
 }
 
 #spinButton:hover {
-    background-color: #aa0000;    
+    /* 【修正點】：強制使用標準背景，消除懸停時變淺 */
+    background: linear-gradient(to top, #660000 0%, #cc0000 70%, #ff3333 100%);
 }
 
 #spinButton:active {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-    transform: translateY(4px);
-}
-
-#spinButton:disabled {
-    background-color: #cc0000;    
-    border-color: #ff5555;    
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);    
-    cursor: not-allowed;
-    transform: none;    
-    opacity: 0.9;    
-}
-
-
-/* ------------------------------------- */
-/* --- 新增：歸零按鈕樣式 --- */
-/* ------------------------------------- */
-
-#resetButton {
-    /* 尺寸設定：比 START 按鈕小，方形 */
-    width: 120px;
-    height: 40px;
+    /* 按下效果 */
+    transform: translateY(2px) translateZ(0); /* 按下位移減小 */
     
-    font-size: 18px;
-    font-weight: bold;
-    color: white;
+    /* 【修正點】：強制使用標準背景，消除按下時變亮/變淺 */
+    background: linear-gradient(to top, #660000 0%, #cc0000 70%, #ff3333 100%);
     
-    /* 棕色背景與邊框 */
-    background-color: #8b4513; /* Saddle Brown */
-    border: 3px solid #a0522d; /* Sienna */
-    border-radius: 6px; /* 輕微圓角 */
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.3), /* 按下時外部陰影減小 */
+        inset 0 1px 2px rgba(0, 0, 0, 0.5), /* 按下時內部陰影減小 */
+        inset 0 -0.5px 1.5px rgba(255, 255, 255, 0.1); /* 按下時內部亮面減小 */
+        
+    transition: box-shadow 0.1s, transform 0.05s ease-out; /* 移除 background 過渡 */
+}
+
+
+/* --- 歸零模式 (灰白色) 樣式 --- */
+#spinButton.reset-mode {
+    /* 背景改為灰白色漸層 */
+    background: linear-gradient(to top, #c0c0c0 0%, #ffffff 70%, #f0f0f0 100%);
     
-    cursor: pointer;
-    transition: background-color 0.1s, box-shadow 0.1s, transform 0.1s;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    /* 邊框顏色改成深灰色 */
+    border-color: #444444;
+    color: #333; /* 文字顏色保持深色 */
+    
+    /* 外部陰影縮小，內部陰影柔和化 */
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.2), /* 外部陰影減小 */
+        inset 0 2px 4px rgba(255, 255, 255, 0.7), /* 內部亮面柔和 */
+        inset 0 -1px 2px rgba(0, 0, 0, 0.2); /* 內部暗面柔和 */
+
+    transition: background 0.1s, box-shadow 0.1s, transform 0.05s ease-out;
+    transform: translateZ(0); 
+    will-change: transform, box-shadow;
+    position: relative;
+    z-index: 10;
 }
 
-#resetButton:hover {
-    background-color: #69340f; /* 懸停時變深 */
+#spinButton.reset-mode:hover {
+    /* 懸停時顏色微亮 */
+    background: linear-gradient(to top, #d0d0d0 0%, #ffffff 70%, #f0f0f0 100%);
 }
 
-#resetButton:active {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    transform: translateY(2px);
-}
-
-#resetButton:disabled {
-    background-color: #8b4513; 
-    border-color: #a0522d;
-    cursor: not-allowed;
-    opacity: 0.7;
-    transform: none;
+#spinButton.reset-mode:active {
+    /* 按下時的陰影變更 */
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.1), /* 按下時外部陰影減小 */
+        inset 0 1px 2px rgba(0, 0, 0, 0.3), /* 按下時內部陰影減小 */
+        inset 0 -0.5px 1.5px rgba(255, 255, 255, 0.1); /* 按下時內部亮面減小 */
+    transform: translateY(1px) translateZ(0); /* 按下位移減小 */
+    
+    transition: background 0.1s, box-shadow 0.1s, transform 0.05s ease-out;
 }

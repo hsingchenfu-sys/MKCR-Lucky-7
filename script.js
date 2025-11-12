@@ -2,7 +2,7 @@
  * Setup: 獲取元素和定義常數
  */
 const spinButton = document.getElementById('spinButton'); 
-const resetButton = document.getElementById('resetButton'); 
+// 移除 resetButton 的引用，因為按鈕已經整合
 const messageElement = document.getElementById('message');
 const slotMachineContainer = document.querySelector('.slot-machine') || document.body; 
 const reelsList = document.querySelectorAll('.slots > .reel'); 
@@ -28,7 +28,8 @@ const icon_width = 80;
 const icon_height = 80;	
 const num_icons = 9;	
 const time_per_icon = 100;
-const indexes = [0, 0, 0]; 
+let indexes = [0, 0, 0]; 
+let isResetMode = false; // 新增：按鈕狀態追蹤
 
 // 預先計算累計權重
 const cumulativeWeights = [];
@@ -38,6 +39,40 @@ for (let i = 0; i < num_icons; i++) {
     cumulativeWeights.push(currentSum);
 }
 const totalWeight = currentSum; 
+
+// --- 按鈕狀態切換函式 ---
+function setButtonToResetMode() {
+    isResetMode = true;
+    if (spinButton) {
+        spinButton.disabled = false;
+        // 【修正點】：變更標籤為「歸 零」
+        spinButton.textContent = '歸 零'; 
+        spinButton.classList.add('reset-mode'); 
+    }
+}
+
+function setButtonToSpinMode() {
+    isResetMode = false;
+    if (spinButton) {
+        spinButton.textContent = 'START';
+        spinButton.classList.remove('reset-mode');
+        spinButton.disabled = false;
+    }
+    // 初始/歸零訊息
+    if (messageElement) {
+        messageElement.innerHTML = '按下「START」開始挑戰！';
+    }
+    // 歸零轉盤位置
+    reelsList.forEach(reel => {
+        reel.style.transition = `none`; 
+        reel.style.backgroundPositionY = `0px`; 
+    });
+    // 重設狀態和索引
+    slotMachineContainer.classList.remove('win1', 'win2', 'win3');
+    reelsList.forEach(reel => reel.classList.remove('highlight-reel')); 
+    indexes = [0, 0, 0];
+}
+// ----------------------
 
 
 /**	
@@ -106,13 +141,13 @@ const roll = (reel, offset = 0) => {
 function rollAll() {
     
     if (spinButton) spinButton.disabled = true;
-    if (resetButton) resetButton.disabled = true; // 禁用歸零按鈕
-
+    
     // 1. 清除舊的樣式
     slotMachineContainer.classList.remove('win1', 'win2', 'win3');
     reelsList.forEach(reel => reel.classList.remove('highlight-reel')); 
 
-    if (messageElement) messageElement.innerHTML = '旋轉中...祝您好運！';
+    // 旋轉中訊息
+    if (messageElement) messageElement.innerHTML = '轉盤中...祝你好運！';
 
 	
 	Promise
@@ -121,16 +156,15 @@ function rollAll() {
 		
 		.then((finalIndexes) => {
 			const currentIndexes = finalIndexes; 
-            
             const iconNames = currentIndexes.map(i => iconMap[i]); 
 			
-            // --- 【中獎判斷邏輯 - 修正：恢復兩連，簡化文字】 ---
+            // --- 【中獎判斷邏輯】 ---
             const isTriple = currentIndexes[0] === currentIndexes[1] && currentIndexes[1] === currentIndexes[2];
-            // 恢復兩連判斷
             const isDouble = currentIndexes[0] === currentIndexes[1] || currentIndexes[1] === currentIndexes[2] || currentIndexes[0] === currentIndexes[2]; 
 
             let isWin = false; 
-            let messageHTML = `很可惜，請再試一次！`; 
+            // 未中獎時的訊息
+            let messageHTML = `很可惜！再接再厲！`; 
             let winCls = "";
             
             if (isTriple) {
@@ -138,18 +172,18 @@ function rollAll() {
                 
                 const isSevenTriple = currentIndexes[0] === 1; 
                 const tripleIconName = iconNames[0];
-                const resultLine = `三連 ${tripleIconName}-${tripleIconName}-${tripleIconName}`;
+                const resultLine = `三連 ${tripleIconName}-${tripleIconName}-${tripleIconName}`; 
 
                 if (isSevenTriple) {
-                    messageHTML = `恭喜！👑 頭獎<br><span class="detail-text">(${resultLine})</span>`;
+                    messageHTML = `恭喜！👑 頭獎<br>(${resultLine})`;
                     winCls = "win3"; 
                 } else {
-                    messageHTML = `恭喜！🎉 大獎<br><span class="detail-text">(${resultLine})</span>`;
+                    messageHTML = `恭喜！🎉 大獎<br>(${resultLine})`;
                     winCls = "win2"; 
                 }
             } else if (isDouble) {
                  isWin = true;
-                 // 【關鍵修正】：移除詳細的圖案名稱，只顯示中獎等級
+                 // 兩連訊息簡化，無 detail-text
                  messageHTML = `恭喜！🌟 小獎`;
                  winCls = "win1";
             }
@@ -157,75 +191,45 @@ function rollAll() {
             
             if (messageElement) messageElement.innerHTML = messageHTML;
             
+            // 處理按鈕切換
             if (isWin) {
 				// 容器閃爍 
 				if (slotMachineContainer) slotMachineContainer.classList.add(winCls);
                 
 				setTimeout(() => {
                     if (slotMachineContainer) slotMachineContainer.classList.remove(winCls);
+                    // 轉為歸零模式
+                    setButtonToResetMode();
                 }, 4000); 
-			}
+			} else {
+                // 未中獎，顯示訊息後，轉為歸零模式
+                const buttonDelay = 1000;
+                setTimeout(() => {
+                    setButtonToResetMode();
+                }, buttonDelay);
+            }
 		
-            const buttonDelay = isWin ? 4000 : 1000;
-            setTimeout(() => {
-                if (spinButton) spinButton.disabled = false;
-                if (resetButton) resetButton.disabled = false; // 啟用歸零按鈕
-            }, buttonDelay);
-            
-            // 更新 indexes (供下次轉動參考)
+            // 更新 indexes
             indexes.splice(0, indexes.length, ...finalIndexes);
 
 		});
 };
 
-/**
- * 將所有轉盤歸零 (第一個圖案)
- */
-function resetAll() {
-    if (spinButton) spinButton.disabled = true; // 歸零時禁用 SPIN 按鈕
-
-    reelsList.forEach(reel => {
-        // 確保轉盤沒有過渡效果
-        reel.style.transition = `none`; 
-        
-        // 設置背景位置為 0px，即第一個圖案的位置
-        reel.style.backgroundPositionY = `0px`; 
-    });
-
-    // 重設狀態和訊息
-    slotMachineContainer.classList.remove('win1', 'win2', 'win3');
-    reelsList.forEach(reel => reel.classList.remove('highlight-reel')); 
-    
-    if (messageElement) messageElement.innerHTML = '已歸零。按下「START」開始遊戲！';
-
-    // 重設索引
-    indexes.splice(0, indexes.length, 0, 0, 0); 
-    
-    // 稍後重新啟用 SPIN 按鈕
-    setTimeout(() => {
-        if (spinButton) spinButton.disabled = false; 
-    }, 500); // 短暫延遲，讓使用者看到歸零效果
-}
-
 
 // 【連接事件和初始化】
 document.addEventListener('DOMContentLoaded', () => {
     
+    // 主按鈕處理邏輯：根據模式執行 SPIN 或 RESET
     if (spinButton) {
-        spinButton.addEventListener('click', rollAll);
+        spinButton.addEventListener('click', () => {
+            if (isResetMode) {
+                setButtonToSpinMode(); // 執行歸零，並切換回 START 模式
+            } else {
+                rollAll(); // 執行 SPIN
+            }
+        });
     }
     
-    // 連接歸零按鈕事件
-    if (resetButton) {
-        resetButton.addEventListener('click', resetAll);
-    }
-    
-    // 初始化時將轉盤位置設為 0px
-    reelsList.forEach(reel => {
-        reel.style.backgroundPositionY = `0px`; 
-    });
-    
-    if (messageElement) {
-        messageElement.innerHTML = '按下「START」開始遊戲！';
-    }
+    // 初始化為 START 模式
+    setButtonToSpinMode(); 
 });
